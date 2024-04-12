@@ -11,7 +11,7 @@ import (
 
 func main() {	
 	http.HandleFunc("/fprint", func(w http.ResponseWriter, r *http.Request) {
-		customerFile, err := os.Open("./customer.csv")
+		customerFile, err := os.Open("./02_static_content/customer.csv")
 		if err != nil {
 			log.Fatal(err)
 		}
