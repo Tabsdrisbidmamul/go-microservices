@@ -18,13 +18,17 @@ func main() {
 
 		defer customerFile.Close()
 
-		data, err := io.ReadAll(customerFile)
-		if err != nil {
-			log.Fatal(err)
-		}
+		// transforms byte array to string data
+		// data, err := io.ReadAll(customerFile)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
 
-		// csv only contains string data, so safe to transform all byte[] to string
-		fmt.Fprint(w, string(data))
+		// // csv only contains string data, so safe to transform all byte[] to string
+		// fmt.Fprint(w, string(data))
+
+		// stream byte array to http
+		io.Copy(w, customerFile);
 		
 	})
 	
