@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 func main() {	
@@ -31,7 +32,30 @@ func main() {
 		io.Copy(w, customerFile);
 		
 	})
+
+	http.HandleFunc("/serveFile", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./02_static_content/customer.csv")
+	})
+
+	http.HandleFunc("/serveContent", func(w http.ResponseWriter, r *http.Request) {
+		customerFile, err := os.Open("./02_static_content/customer.csv")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		defer customerFile.Close()
+
+		 http.ServeContent(w, r, "customerdata.csv", time.Now(), customerFile)
+	})
 	
+	http.Handle(
+		"/files/", 
+		http.StripPrefix(
+			"/files/", 
+			http.FileServer(http.Dir("./02_static_content")),
+		),
+	)
+
 	server := http.Server {
 		Addr: ":3000",
 	}
