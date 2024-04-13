@@ -11,6 +11,7 @@ import (
 )
 
 func main() {	
+	// simplest handler, but return in the writer the stream of bytes from file
 	http.HandleFunc("/fprint", func(w http.ResponseWriter, r *http.Request) {
 		customerFile, err := os.Open("./02_static_content/customer.csv")
 		if err != nil {
@@ -33,10 +34,12 @@ func main() {
 		
 	})
 
+	// serve one file
 	http.HandleFunc("/serveFile", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./02_static_content/customer.csv")
 	})
 
+	// more flexible than /serveFile, but serve one file
 	http.HandleFunc("/serveContent", func(w http.ResponseWriter, r *http.Request) {
 		customerFile, err := os.Open("./02_static_content/customer.csv")
 		if err != nil {
@@ -48,6 +51,7 @@ func main() {
 		 http.ServeContent(w, r, "customerdata.csv", time.Now(), customerFile)
 	})
 	
+	// server an entire directory of static content
 	http.Handle(
 		"/files/", 
 		http.StripPrefix(
