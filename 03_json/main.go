@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/csv"
 	"encoding/json"
@@ -10,21 +11,43 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
 
 func main() {
 	http.HandleFunc("/customers/add", func(w http.ResponseWriter, r *http.Request) {
-		var c Customer
-		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&c)
+		switch r.Method {
+		case http.MethodPost: 
+			var c Customer
+			decoder := json.NewDecoder(r.Body)
+			err := decoder.Decode(&c)
+
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			log.Printf("decoded c %+v", c)
+		}
+	})
+
+	go func() {
+		time.Sleep(2 * time.Second)
+
+		_, err := http.Post("http://localhost:3000/customers/add", "application/json", bytes.NewBuffer([]byte(`
+			{
+				"id": 3,
+				"firstName": "third first name",
+				"secondName": "third last name",
+				"address": "third address"
+			}
+		`)))
 
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			log.Fatal(err)
 			return
 		}
-
-		log.Print(c)
-	})
+	}()
 
 	http.HandleFunc("/customers", func(w http.ResponseWriter, r *http.Request) {
 		customers, err := readCustomers()
